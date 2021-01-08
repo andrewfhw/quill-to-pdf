@@ -1,4 +1,4 @@
-import { ParsedQuillDelta, RawQuillDelta } from "quilljs-parser";
+import { ParsedQuillDelta, RawQuillDelta, TextRun } from "quilljs-parser";
 
 export type RawOrParsedDelta = RawQuillDelta | ParsedQuillDelta | RawQuillDelta[] | ParsedQuillDelta[];
 
@@ -11,3 +11,5 @@ export interface TextBase {
     fontSize: number;
     indent?: number;
 }
+
+export type Runs = (TextRun | { formula: string})[];
