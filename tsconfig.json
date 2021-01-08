@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "sourceMap": true,
+        "strict": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "ES6",
+        "allowJs": true,
+        "declaration": true,
+        "declarationMap": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true
+    },
+    "exclude": [
+        "node_module",
+        "webpack.config.ts",
+        "dist"
+    ]
+}
