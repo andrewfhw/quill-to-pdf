@@ -49,7 +49,7 @@ function getListIndicator(level: number): string {
 };
 
 // main function for package; called by user
-export function generatePdf(delta: RawOrParsedDelta): void {
+export function generatePdf(delta: RawOrParsedDelta, config?: Config): void {
     doc = undefined;
     resetLevelTrackers();
     const parsed = prepareInput(delta);
