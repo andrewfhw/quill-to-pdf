@@ -6,7 +6,8 @@
   "types": "./dist/src/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "webpack"
+    "build": "webpack",
+    "prepublishOnly": "build"
   },
   "repository": {
     "type": "git",
