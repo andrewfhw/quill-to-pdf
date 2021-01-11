@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "webpack",
-    "prepublishOnly": "build"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
