@@ -47,7 +47,7 @@ function getListIndicator(level: number): string {
 // MAIN FUNCTION CALLED BY PACKAGE CONSUMER
 // returns an observable
 
-export function generatePdf(delta: RawOrParsedDelta, config: Config): Promise<any> {
+export function generatePdf(delta: RawOrParsedDelta, config: Config): Promise<Blob | object> {
     return new Promise((resolve, reject) => {
         try {
             let doc: any;
