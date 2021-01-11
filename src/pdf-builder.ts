@@ -1,8 +1,6 @@
-import PDFDocument from './pdfkit.standalone';
-import BlobStream from './blob-stream';
-import { RawQuillDelta, ParsedQuillDelta, parseQuillDelta, Paragraph, TextRun, InsertEmbed, RunAttributes, LineAttributes } from 'quilljs-parser';
-import { Config, RawOrParsedDelta, Runs, TextBase } from './interfaces';
-import { letters, numbers, roman, styles } from './default-styles';
+import { InsertEmbed, LineAttributes, Paragraph, ParsedQuillDelta, parseQuillDelta, RawQuillDelta, RunAttributes, TextRun } from "quilljs-parser";
+import { letters, numbers, roman, styles } from "./default-styles";
+import { RawOrParsedDelta, Runs, TextBase } from "./interfaces";
 
 // what indicator type is used for each of the 6 levels of ordered lists
 const listIndicators = [numbers, letters, roman, numbers, letters, roman];
@@ -35,7 +33,7 @@ function updateLevelTrackers(level: number) {
         }
         index++;
     }
-};
+}
 
 // returns the appropriate ordered list indicator; updates tracking
 function getListIndicator(level: number): string {
@@ -44,65 +42,8 @@ function getListIndicator(level: number): string {
     return listIndicator;
 };
 
-// MAIN FUNCTION CALLED BY PACKAGE CONSUMER
-// returns an observable
-
-export function generatePdf(delta: RawOrParsedDelta, config: Config): Promise<any> {
-    return new Promise((resolve, reject) => {
-        try {
-            let doc: any;
-            const stream = getPdfStream(doc, delta);
-            stream.on('finish', () => {
-                const blob = stream.toBlob('application/pdf');
-                resolve(blob);
-            });
-        } catch (err) {
-            reject(err);
-        }
-    });
-}
-
-function getPdfStream(doc: any, delta: RawOrParsedDelta) {
-    resetLevelTrackers();
-    const parsed = prepareInput(delta);
-    doc = new PDFDocument() as any;
-    const stream = doc.pipe(BlobStream() as any);
-    buildPdf(parsed, doc);
-    doc.end();
-    return stream;
-}
-
-/*
-export function generatePdf(delta: RawOrParsedDelta, config: Config): Observable<Blob | object> {
-    let doc: any = undefined;
-    resetLevelTrackers();
-    const parsed = prepareInput(delta);
-    doc = new PDFDocument() as any;
-    const stream = doc.pipe(BlobStream() as any);
-    buildPdf(parsed, doc);
-    doc.end();
-    return new Observable(subscriber => {
-        try {
-            stream.on('finish', () => {
-                if (config.exportAs === 'blob' || !config.exportAs) {
-                    const blob = stream.toBlob('application/pdf');
-                    subscriber.next(blob);
-                    subscriber.complete();
-                } else {
-                    subscriber.next(doc);
-                    subscriber.complete();
-                }
-            });
-        } catch {
-            subscriber.error(new Error('Unable to create the PDF.'));
-        }
-        
-    });
-};
-*/
-
 // prepare input deltas for processing to PDF
-function prepareInput(delta: RawOrParsedDelta): ParsedQuillDelta[] {
+export function prepareInput(delta: RawOrParsedDelta): ParsedQuillDelta[] {
     // handle array of deltas
     if (Array.isArray(delta)) {
         // handle array of raw deltas
@@ -137,7 +78,8 @@ function prepareInput(delta: RawOrParsedDelta): ParsedQuillDelta[] {
 };
 
 // builds the PDF document
-function buildPdf(parsedDeltas: ParsedQuillDelta[], doc: any): void {
+export function buildPdf(parsedDeltas: ParsedQuillDelta[], doc: any): void {
+    resetLevelTrackers();
     for (const delta of parsedDeltas) {
         for (const paragraph of delta.paragraphs) {
             buildParagraph(paragraph, doc);
@@ -174,7 +116,7 @@ function buildEmbed(embed: InsertEmbed, doc: any) {
             continued: false
         });
     }
-};
+}
 
 // handles all formatted paragraphs
 function buildFormattedParagraphs(paragraph: Paragraph, doc: any): void {

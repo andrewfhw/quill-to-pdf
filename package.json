@@ -39,7 +39,7 @@
     "webpack-cli": "^4.3.1"
   },
   "dependencies": {
-    "file-saver": "^2.0.5",
-    "quilljs-parser": "^1.0.11"
+    "quilljs-parser": "^1.0.11",
+    "rxjs": "^6.6.3"
   }
 }
