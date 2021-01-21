@@ -4,6 +4,13 @@ export type RawOrParsedDelta = RawQuillDelta | ParsedQuillDelta | RawQuillDelta[
 
 export interface Config {
     exportAs: 'blob' | 'pdfKit';
+    styles?: {
+        normal?: {
+            font: string;
+            fontSize: number;
+            baseIndent: number;
+        }
+    }
 }
 
 export interface TextBase {

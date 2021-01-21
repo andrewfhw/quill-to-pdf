@@ -33,6 +33,11 @@ export let styles = {
         fontSize: 12,
         baseIndent: 50,
         levelIndent: 25
+    },
+    citation: {
+        font: 'Times-Roman',
+        fontSize: 12,
+        baseIndent: 0
     }
 };
 

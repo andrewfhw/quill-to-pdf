@@ -10,6 +10,9 @@ const listIndicators = [numbers, letters, roman, numbers, letters, roman];
 // array used to track the current indicator for each level of ordered lists
 const levelTrackers: number[] = [0, 0, 0, 0, 0, 0];
 
+// styles
+let style = styles;
+
 // resets ordered list back to original state (all levels at 0)
 function resetLevelTrackers(): void {
     let index = 0;
@@ -51,7 +54,7 @@ export function generatePdf(delta: RawOrParsedDelta, config: Config): Promise<Bl
     return new Promise((resolve, reject) => {
         try {
             let doc: any;
-            const stream = getPdfStream(doc, delta);
+            const stream = getPdfStream(doc, delta, config);
             stream.on('finish', () => {
                 const blob = stream.toBlob('application/pdf');
                 resolve(blob);
@@ -62,8 +65,12 @@ export function generatePdf(delta: RawOrParsedDelta, config: Config): Promise<Bl
     });
 }
 
-function getPdfStream(doc: any, delta: RawOrParsedDelta) {
+function getPdfStream(doc: any, delta: RawOrParsedDelta, config: Config) {
     resetLevelTrackers();
+    style = styles;
+    if (config && config.styles && config.styles.normal) {
+        style.normal = config.styles.normal;
+    }
     const parsed = prepareInput(delta);
     doc = new PDFDocument() as any;
     const stream = doc.pipe(BlobStream() as any);
@@ -71,35 +78,6 @@ function getPdfStream(doc: any, delta: RawOrParsedDelta) {
     doc.end();
     return stream;
 }
-
-/*
-export function generatePdf(delta: RawOrParsedDelta, config: Config): Observable<Blob | object> {
-    let doc: any = undefined;
-    resetLevelTrackers();
-    const parsed = prepareInput(delta);
-    doc = new PDFDocument() as any;
-    const stream = doc.pipe(BlobStream() as any);
-    buildPdf(parsed, doc);
-    doc.end();
-    return new Observable(subscriber => {
-        try {
-            stream.on('finish', () => {
-                if (config.exportAs === 'blob' || !config.exportAs) {
-                    const blob = stream.toBlob('application/pdf');
-                    subscriber.next(blob);
-                    subscriber.complete();
-                } else {
-                    subscriber.next(doc);
-                    subscriber.complete();
-                }
-            });
-        } catch {
-            subscriber.error(new Error('Unable to create the PDF.'));
-        }
-        
-    });
-};
-*/
 
 // prepare input deltas for processing to PDF
 function prepareInput(delta: RawOrParsedDelta): ParsedQuillDelta[] {
