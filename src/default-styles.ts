@@ -1,20 +1,30 @@
-export let styles = {
+import { StyleConfig } from "./interfaces";
+
+export let styles: StyleConfig = {
     normal: {
         font: 'Times-Roman',
-        fontSize: 12
+        fontSize: 12,
+        baseIndent: 72,
+        levelIndent: 0,
     },
     header_1: {
         font: 'Helvetica-Bold',
         fontSize: 16,
+        baseIndent: 72,
+        levelIndent: 0
     },
     header_2: {
         font: 'Helvetica-Bold',
         fontSize: 14,
+        baseIndent: 72,
+        levelIndent: 0
     },
     block_quote: {
         font: 'Times-Italic',
         fontSize: 12,
         italics: true,
+        baseIndent: 72,
+        levelIndent: 0,
         indent: {
             left: 0,
             right: 0
@@ -23,6 +33,8 @@ export let styles = {
     code_block: {
         font: 'Courier',
         fontSize: 12,
+        baseIndent: 72,
+        levelIndent: 0,
         indent: {
             left: 0,
             right: 0
@@ -37,7 +49,8 @@ export let styles = {
     citation: {
         font: 'Times-Roman',
         fontSize: 12,
-        baseIndent: 0
+        baseIndent: 72,
+        levelIndent: 0
     }
 };
 

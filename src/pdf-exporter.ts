@@ -4,6 +4,14 @@ import { RawQuillDelta, ParsedQuillDelta, parseQuillDelta, Paragraph, TextRun, I
 import { Config, RawOrParsedDelta, Runs, TextBase } from './interfaces';
 import { letters, numbers, roman, styles } from './default-styles';
 
+interface LineAttr extends LineAttributes {
+    citation?: boolean;
+}
+
+interface QParagraph extends Paragraph {
+    attributes?: LineAttr;
+}
+
 // what indicator type is used for each of the 6 levels of ordered lists
 const listIndicators = [numbers, letters, roman, numbers, letters, roman];
 
@@ -68,8 +76,8 @@ export function generatePdf(delta: RawOrParsedDelta, config: Config): Promise<Bl
 function getPdfStream(doc: any, delta: RawOrParsedDelta, config: Config) {
     resetLevelTrackers();
     style = styles;
-    if (config && config.styles && config.styles.normal) {
-        style.normal = config.styles.normal;
+    if (config && config.styles) {
+        configureStyles(config);
     }
     const parsed = prepareInput(delta);
     doc = new PDFDocument() as any;
@@ -77,6 +85,30 @@ function getPdfStream(doc: any, delta: RawOrParsedDelta, config: Config) {
     buildPdf(parsed, doc);
     doc.end();
     return stream;
+}
+
+function configureStyles(config: Config) {
+    if (config.styles?.normal) {
+        style.normal = config.styles.normal;
+    }
+    if (config.styles?.header_1) {
+        style.header_1 = config.styles.header_1;
+    }
+    if (config.styles?.header_2) {
+        style.header_2 = config.styles.header_2;
+    }
+    if (config.styles?.block_quote) {
+        style.block_quote = config.styles.block_quote;
+    }
+    if (config.styles?.code_block) {
+        style.code_block = config.styles.code_block;
+    }
+    if (config.styles?.list_paragraph) {
+        style.list_paragraph = config.styles.list_paragraph;
+    }
+    if (config.styles?.citation) {
+        style.citation = config.styles.citation;
+    }
 }
 
 // prepare input deltas for processing to PDF
@@ -124,7 +156,7 @@ function buildPdf(parsedDeltas: ParsedQuillDelta[], doc: any): void {
 };
 
 // builds paragraphs; first fn called on paragraph inputs
-function buildParagraph(paragraph: Paragraph, doc: any): void {
+function buildParagraph(paragraph: QParagraph, doc: any): void {
     doc.moveDown();
     // handle embeds
     if (paragraph.embed) {
@@ -146,8 +178,8 @@ function buildEmbed(embed: InsertEmbed, doc: any) {
     if (embed.image) {
         doc.image(embed.image, { fit: [200, 200], align: 'center' });
     } else if (embed.video) {
-        doc.font(styles.normal.font);
-        doc.fontSize(styles.normal.fontSize);
+        doc.font(style.normal.font);
+        doc.fontSize(style.normal.fontSize);
         doc.text(embed.video, {
             continued: false
         });
@@ -155,7 +187,7 @@ function buildEmbed(embed: InsertEmbed, doc: any) {
 };
 
 // handles all formatted paragraphs
-function buildFormattedParagraphs(paragraph: Paragraph, doc: any): void {
+function buildFormattedParagraphs(paragraph: QParagraph, doc: any): void {
     const lineAttributes = paragraph.attributes;
     if (!lineAttributes) {
         throw new Error('Something went wrong.');
@@ -173,17 +205,22 @@ function buildFormattedParagraphs(paragraph: Paragraph, doc: any): void {
         buildCodeBlock(paragraph.textRuns as Runs, doc);
     }
     if (lineAttributes.list) {
-        buildList(paragraph.textRuns as Runs, paragraph.attributes as LineAttributes, doc);
+        buildList(paragraph.textRuns as Runs, paragraph.attributes as LineAttr, doc);
+    }
+    if (lineAttributes.citation) {
+        buildCitation(paragraph.textRuns as Runs, paragraph.attributes as LineAttr, doc);
     }
 };
 
 // handle all unformatted paragraphs
-function buildSimpleParagraphs(paragraph: Paragraph, doc: any): void {
-    doc.font(styles.normal.font);
-    doc.fontSize(styles.normal.fontSize);
+function buildSimpleParagraphs(paragraph: QParagraph, doc: any): void {
+    doc.font(style.normal.font);
+    doc.fontSize(style.normal.fontSize);
+    const baseIndent = style.normal.baseIndent;
     buildRuns(paragraph.textRuns as TextRun[], {
-        font: styles.normal.font,
-        fontSize: styles.normal.fontSize
+        font: style.normal.font,
+        fontSize: style.normal.fontSize,
+        indent: baseIndent
     }, doc);
 };
 
@@ -192,44 +229,48 @@ function buildSimpleParagraphs(paragraph: Paragraph, doc: any): void {
 // builds paragraphs with header formatting
 function buildHeader(textRuns: Runs, level: number, doc: any): void {
     if (level === 1) {
-        doc.font(styles.header_1.font);
-        doc.fontSize(styles.header_1.fontSize);
+        doc.font(style.header_1.font);
+        doc.fontSize(style.header_1.fontSize);
         buildRuns(textRuns, {
-            font: styles.header_1.font,
-            fontSize: styles.header_1.fontSize
+            font: style.header_1.font,
+            fontSize: style.header_1.fontSize,
+            indent: style.header_1.baseIndent
         }, doc);
     } else if (level === 2) {
-        doc.font(styles.header_2.font);
-        doc.fontSize(styles.header_2.fontSize);
+        doc.font(style.header_2.font);
+        doc.fontSize(style.header_2.fontSize);
         buildRuns(textRuns, {
-            font: styles.header_2.font,
-            fontSize: styles.header_2.fontSize
+            font: style.header_2.font,
+            fontSize: style.header_2.fontSize,
+            indent: style.header_2.baseIndent
         }, doc);
     }
 };
 
 // builds paragraphs with blockquote formatting
 function buildBlockQuote(textRuns: Runs, doc: any): void {
-    doc.font(styles.block_quote.font);
-    doc.fontSize(styles.block_quote.fontSize);
+    doc.font(style.block_quote.font);
+    doc.fontSize(style.block_quote.fontSize);
     buildRuns(textRuns, {
-        font: styles.block_quote.font,
-        fontSize: styles.block_quote.fontSize
+        font: style.block_quote.font,
+        fontSize: style.block_quote.fontSize,
+        indent: style.block_quote.baseIndent
     }, doc);
 };
 
 // builds paragraphs with code block formatting
 function buildCodeBlock(textRuns: Runs, doc: any): void {
-    doc.font(styles.code_block.font);
-    doc.fontSize(styles.code_block.fontSize);
+    doc.font(style.code_block.font);
+    doc.fontSize(style.code_block.fontSize);
     buildRuns(textRuns, {
-        font: styles.code_block.font,
-        fontSize: styles.code_block.fontSize
+        font: style.code_block.font,
+        fontSize: style.code_block.fontSize,
+        indent: style.code_block.baseIndent
     }, doc);
 };
 
 // builds paragraphs with list formatting
-function buildList(textRuns: Runs, lineAttributes: LineAttributes, doc: any): void {
+function buildList(textRuns: Runs, lineAttributes: LineAttr, doc: any): void {
     if (lineAttributes.list === 'bullet') {
         resetLevelTrackers();
         buildBulletList(textRuns, lineAttributes, doc);
@@ -239,44 +280,56 @@ function buildList(textRuns: Runs, lineAttributes: LineAttributes, doc: any): vo
 };
 
 // builds ordered lists; updates tracking
-function buildOrderedList(textRuns: Runs, lineAttributes: LineAttributes, doc: any): void {
-    doc.font(styles.list_paragraph.font);
-    doc.fontSize(styles.list_paragraph.fontSize);
+function buildOrderedList(textRuns: Runs, lineAttributes: LineAttr, doc: any): void {
+    doc.font(style.list_paragraph.font);
+    doc.fontSize(style.list_paragraph.fontSize);
     doc.fillColor('black');
-    let baseIndent = styles.list_paragraph.baseIndent;
-    let levelIndent = styles.list_paragraph.levelIndent;
+    let baseIndent = style.list_paragraph.baseIndent;
+    let levelIndent = style.list_paragraph.levelIndent;
     let level = (lineAttributes.indent ? lineAttributes.indent : 0);
     doc.text(getListIndicator(level) + '.', baseIndent + (levelIndent * (level + 1)), null, {
-        width: (72*6.5)-(3+levelIndent*(level + 1)),
+        width: (72*6.5)-(3+(baseIndent)+levelIndent*(level + 1)),
         continued: false
     });
     doc.moveUp();
     buildRuns(textRuns, {
-        font: styles.list_paragraph.font,
-        fontSize: styles.list_paragraph.fontSize,
-        indent: 75 + (levelIndent * (level + 1))
+        font: style.list_paragraph.font,
+        fontSize: style.list_paragraph.fontSize,
+        indent: baseIndent + levelIndent + 3 + (levelIndent * (level + 1))
     }, doc);
 };
 
 // builds unordered lists
-function buildBulletList(textRuns: Runs, lineAttributes: LineAttributes, doc: any): void {
-    doc.font(styles.list_paragraph.font);
-    doc.fontSize(styles.list_paragraph.fontSize);
+function buildBulletList(textRuns: Runs, lineAttributes: LineAttr, doc: any): void {
+    doc.font(style.list_paragraph.font);
+    doc.fontSize(style.list_paragraph.fontSize);
     doc.fillColor('black');
-    let baseIndent = styles.list_paragraph.baseIndent;
-    let levelIndent = styles.list_paragraph.levelIndent;
+    let baseIndent = style.list_paragraph.baseIndent;
+    let levelIndent = style.list_paragraph.levelIndent;
     let level = (lineAttributes.indent ? lineAttributes.indent : 0 ) + 1;
     doc.text('\u2022', baseIndent + (levelIndent * level), null, {
-        width: (72*6.5)-(3+levelIndent*level),
+        width: (72*6.5)-(3+(baseIndent)+levelIndent*level),
         continued: false
     });
     doc.moveUp();
     buildRuns(textRuns, {
-        font: styles.list_paragraph.font,
-        fontSize: styles.list_paragraph.fontSize,
-        indent: 75 + (levelIndent * level)
+        font: style.list_paragraph.font,
+        fontSize: style.list_paragraph.fontSize,
+        indent: baseIndent + levelIndent + 3 + (levelIndent * level)
     }, doc);
 };
+
+function buildCitation(textRuns: Runs, lineAttributes: LineAttr, doc: any): void {
+    doc.font(style.citation.font);
+    doc.fontSize(style.citation.fontSize);
+    doc.fillColor('black');
+    buildRuns(textRuns, {
+        font: style.citation.font,
+        fontSize: style.citation.fontSize,
+        indent: style.citation.baseIndent
+    }, doc);
+}
+
 
 // BUILDING RUNS
 
