@@ -1,4 +1,13 @@
-import { ParsedQuillDelta, RawQuillDelta, TextRun } from "quilljs-parser";
+import { LineAttributes, Paragraph, ParsedQuillDelta, RawQuillDelta, TextRun } from "quilljs-parser";
+
+
+export interface LineAttr extends LineAttributes {
+    citation?: boolean;
+}
+
+export interface QParagraph extends Paragraph {
+    attributes?: LineAttr;
+}
 
 export type RawOrParsedDelta = RawQuillDelta | ParsedQuillDelta | RawQuillDelta[] | ParsedQuillDelta[];
 

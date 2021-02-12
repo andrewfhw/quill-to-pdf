@@ -1,2 +1,2 @@
-export * from './pdf-exporter';
+export { default as PdfExporter } from './pdf-exporter';
 export * from './interfaces';
