@@ -1,27 +1,31 @@
 import PDFDocument from './pdfkit.standalone';
 import BlobStream from './blob-stream';
 import { letters, numbers, roman, styles } from "./default-styles";
-import { Config, LineAttr, QParagraph, RawOrParsedDelta, Runs, TextBase } from "./interfaces";
+import { Config, LineAttr, QParagraph, RawOrParsedDelta, Runs, StyleConfig, TextBase } from "./interfaces";
 import { InsertEmbed, ParsedQuillDelta, parseQuillDelta, RawQuillDelta, RunAttributes, TextRun } from 'quilljs-parser';
 
 class PdfBuilder {
 
     // what indicator type is used for each of the 6 levels of ordered lists
-    private listIndicators = [numbers, letters, roman, numbers, letters, roman];
+    listIndicators: string[][];
 
     // array used to track the current indicator for each level of ordered lists
-    private levelTrackers: number[] = [0, 0, 0, 0, 0, 0];
+    levelTrackers: number[];
 
     // the default text styles
-    private style = styles;
+    style: StyleConfig;
 
-    constructor() {}
+    constructor() {
+        this.style = Object.assign({}, styles);
+        this.levelTrackers = [0, 0, 0, 0, 0, 0];
+        this.listIndicators = [numbers, letters, roman, numbers, letters, roman];
+    }
 
 
     // Starts the PDF stream which will contain the PDF document output
     getPdfStream(doc: any, delta: RawOrParsedDelta, config: Config) {
         this.resetLevelTrackers();
-        this.style = styles;
+        this.resetStyles();
         if (config && config.styles) {
             this.configureStyles(config);
         }
@@ -122,6 +126,7 @@ class PdfBuilder {
             this.buildList(paragraph.textRuns as Runs, paragraph.attributes as LineAttr, doc);
         }
         if (lineAttributes.citation) {
+            this.resetLevelTrackers();
             this.buildCitation(paragraph.textRuns as Runs, paragraph.attributes as LineAttr, doc);
         }
     }
@@ -247,7 +252,13 @@ class PdfBuilder {
             doc.font(base.font);
             doc.fontSize(base.fontSize);
             this.setPreRunAttributes((run as TextRun).attributes, base, doc);
-            doc.text((run as TextRun).text ? (run as TextRun).text : (run as {formula: string}).formula, base.indent ? base.indent : 72, null, this.setRunAttributes((run as TextRun).attributes, runTracker === textRuns.length-1));
+            doc.text(
+                (run as TextRun).text ? (run as TextRun).text : (run as {formula: string}).formula, // text content
+                base.indent ? base.indent : 72, // left indent (x)
+                null, // vertical spacing (y)
+                this.setRunAttributes( // formatting object
+                    (run as TextRun).attributes,
+                    runTracker === textRuns.length-1));
             runTracker++;
         };
     };
@@ -277,8 +288,7 @@ class PdfBuilder {
     };
 
     // adjusts the run size based on the base size
-    setRunSize(size: string, baseSize: number, doc: any): void {
-        console.log('running');
+    setRunSize(size: 'small' | 'large' | 'huge', baseSize: number, doc: any): void {
         switch (size) {
             case 'small':
                 doc.fontSize(baseSize - 4);
@@ -336,7 +346,7 @@ class PdfBuilder {
                 const parsed = parseQuillDelta(delta as RawQuillDelta);
                 return [parsed];
             // handle single parsed delta
-            } else if ((delta as ParsedQuillDelta)) {
+            } else if ((delta as ParsedQuillDelta).paragraphs) {
                 return [delta as ParsedQuillDelta];
             // handle invalid input
             } else {
@@ -347,27 +357,19 @@ class PdfBuilder {
 
     // Overrides the default styles with user-provided styles
     configureStyles(config: Config) {
-        if (config.styles?.normal) {
-            this.style.normal = config.styles.normal;
+        if (!config.styles) {
+            throw new Error('No style keys found.');
         }
-        if (config.styles?.header_1) {
-            this.style.header_1 = config.styles.header_1;
-        }
-        if (config.styles?.header_2) {
-            this.style.header_2 = config.styles.header_2;
-        }
-        if (config.styles?.block_quote) {
-            this.style.block_quote = config.styles.block_quote;
-        }
-        if (config.styles?.code_block) {
-            this.style.code_block = config.styles.code_block;
-        }
-        if (config.styles?.list_paragraph) {
-            this.style.list_paragraph = config.styles.list_paragraph;
-        }
-        if (config.styles?.citation) {
-            this.style.citation = config.styles.citation;
-        }
+        for (const key of Object.keys(config.styles)) {
+            if (config.styles[key]) {
+                this.style[key] = config.styles[key] as any;
+            }
+        };
+    }
+
+    // sets the styles back to their defaults
+    resetStyles() {
+        this.style = Object.assign({}, styles);
     }
 
 

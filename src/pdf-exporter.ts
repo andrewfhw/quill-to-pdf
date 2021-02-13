@@ -1,9 +1,9 @@
 import { Config, RawOrParsedDelta } from './interfaces';
 import {default as PdfBuilder } from './pdf-builder';
 
-class PdfExporter {
+export class PdfExporter {
 
-    private readonly pdfBuilder: PdfBuilder;
+    readonly pdfBuilder: PdfBuilder;
 
     constructor() {
         this.pdfBuilder = new PdfBuilder();

@@ -1,175 +1,62 @@
-import { RunAttributes } from 'quilljs-parser';
-import { TextBase } from './interfaces';
-import PDFDocument from './pdfkit.standalone';
-import { setBoldFont, setPreRunAttributes, setRunAttributes, setRunSize } from './pdf-exporter';
+import { Config, RawOrParsedDelta } from './interfaces';
+import { default as exporter, PdfExporter } from './pdf-exporter';
 
-describe('pdfexporter', () => {
 
-    let doc: any;
+describe('exported object', () => {
 
-    describe('setBoldFont', () => {
-
-        let fontSpy: any;
-
-        beforeEach(() => {
-            doc = new PDFDocument();
-            fontSpy = jest.spyOn(doc, 'font');
-        });
-
-        it('should bold Times', () => {
-            setBoldFont('Times-Roman', doc);
-            expect(fontSpy).toHaveBeenCalledWith('Times-Bold');
-        });
-
-        it('should bold courier', () => {
-            setBoldFont('Courier', doc);
-            expect(fontSpy).toHaveBeenCalledWith('Courier-Bold');
-        });
-
-        it('should bold Helvetica', () => {
-            setBoldFont('Helvetica', doc);
-            expect(fontSpy).toHaveBeenCalledWith('Helvetica-Bold');
-        });
-
+    it('should be defined', () => {
+        expect(exporter).toBeDefined();
     });
 
-    describe('setRunSize', () => {
-
-        let sizeSpy: any;
-
-        beforeEach(() => {
-            doc = new PDFDocument();
-            sizeSpy = jest.spyOn(doc, 'fontSize');
-        });
-
-        it('should transform size to small', () => {
-            setRunSize('small', 12, doc);
-            expect(sizeSpy).toHaveBeenCalledWith(8);
-        });
-
-        it('should transform size to large', () => {
-            setRunSize('large', 12, doc);
-            expect(sizeSpy).toHaveBeenCalledWith(16);
-        });
-
-        it('should transform size to huge', () => {
-            setRunSize('huge', 12, doc);
-            expect(sizeSpy).toHaveBeenCalledWith(18);
-        });
-
+    it('should be an instance of class PdfExporter', () => {
+        expect(exporter).toBeInstanceOf(PdfExporter);
     });
 
-    describe('setRunAttributes', () => {
+});
 
-        beforeEach(() => {
-            doc = new PDFDocument();
-        });
+describe('generatePdf', () => {
 
-        it('should underline the text', () => {
-            const input: RunAttributes = {
-                underline: true
-            };
-            const output = {
-                underline: true,
-                strike: false,
-                oblique: false, 
-                link: null,
-                continued: true
-            };
-            const result = setRunAttributes(input, false);
-            expect(result).toEqual(output);
-        });
+    let fakeDelta: RawOrParsedDelta;
+    let fakeConfig: Config;
+    let fakeStream: any;
 
-        it('should strike the text', () => {
-            const input: RunAttributes = {
-                strike: true
-            };
-            const output = {
-                underline: false,
-                strike: true,
-                oblique: false,
-                link: null,
-                continued: false
-            };
-            const result = setRunAttributes(input, true);
-            expect(result).toEqual(output);
-        });
-
-        it('should oblique', () => {
-            const input: RunAttributes = {
-                italic: true
-            };
-            const output = {
-                underline: false,
-                strike: false,
-                oblique: true,
-                link: null,
-                continued: true
-            };
-            const result = setRunAttributes(input, false);
-            expect(result).toEqual(output);
-        });
-
-        it('should be a link', () => {
-            const input: RunAttributes = {
-                link: 'google.com'
-            };
-            const output = {
-                underline: false,
-                strike: false,
-                oblique: false,
-                link: 'google.com',
-                continued: true
-            };
-            const result = setRunAttributes(input, false);
-            expect(result).toEqual(output);
-
-        });
-
-        it('should be underline and link', () => {
-            const input: RunAttributes = {
-                underline: true,
-                link: 'google.com'
-            };
-            const output = {
-                underline: true,
-                strike: false,
-                oblique: false,
-                link: 'google.com',
-                continued: true
-            };
-            const result = setRunAttributes(input, false);
-            expect(output).toEqual(result);
-        });
-
+    beforeEach(() => {
+        fakeDelta = { ops: [{ insert: '\n' }] };
+        fakeConfig = { exportAs: 'blob' };
+        fakeStream = {
+            onRecord: {
+                event: '',
+                callback: undefined
+            },
+            blobArg: '',
+            on: function (event: string, callback: any) {
+                this.onRecord = {
+                    event: event,
+                    callback: callback
+                }
+            },
+            toBlob: function (app: string) {
+                this.blobArg = app;
+                return 'fakeblob';
+            }
+        }
     });
 
-    describe('setPreRunAttributes', () => {
+    it('should be defined', () => {
+        expect(exporter.generatePdf).toBeDefined();
+    });
 
-        let fillSpy: any;
-        let runSizeSpy: any;
+    it('should return a promise', () => {
+        const returnValue = exporter.generatePdf(fakeDelta, fakeConfig);
+        expect(returnValue).toBeInstanceOf(Promise);
+    });
 
-        beforeEach(() => {
-            doc = new PDFDocument();
-            fillSpy = jest.spyOn(doc, 'fillColor');
-        });
-
-        it('should set the run size', () => {
-            const attr: RunAttributes = {
-                size: 'small',
-                bold: true
-            };
-            const base: TextBase = {
-                font: 'Times-Roman',
-                fontSize: 12
-            };
-            setPreRunAttributes(attr, base, doc);
-        });
-
-        it.todo('should set font to bold');
-
-        it.todo('should set fill color based on link or no link');
-
+    it('should call getPdfStream and resolve with the blob', async () => {
+        const getPdfSpy = jest.spyOn(exporter.pdfBuilder, 'getPdfStream').mockReturnValue(fakeStream);
+        const promise = exporter.generatePdf(fakeDelta, fakeConfig);
+        expect(getPdfSpy).toHaveBeenCalledWith(undefined, fakeDelta, fakeConfig);
+        expect(fakeStream.onRecord.event).toBe('finish');
+        expect(fakeStream.onRecord.callback.toString().replace(/ /g, '').replace(/\n/g, '')).toBe('()=>{constblob=stream.toBlob(\'application/pdf\');resolve(blob);}');
     });
 
 });

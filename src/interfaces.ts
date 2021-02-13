@@ -24,6 +24,7 @@ export interface RequiredStyleInfo {
 }
 
 export interface StyleConfig {
+    [index: string]: RequiredStyleInfo;
     normal: RequiredStyleInfo;
     header_1: RequiredStyleInfo;
     header_2: RequiredStyleInfo;
