@@ -45,7 +45,7 @@ describe('generatePdf', () => {
 
     beforeEach(() => {
         fakeDelta = { ops: [{ insert: '\n' }] };
-        fakeConfig = { exportAs: 'blob' };
+        fakeConfig = { };
         fakeStream = new FakeStream();
         mockPdfBuilder.prototype.getPdfStream.mockImplementation(() => fakeStream);
     });

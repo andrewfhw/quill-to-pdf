@@ -10,8 +10,15 @@
 
 Install using npm:
 
-```npm i quill-to-pdf --save```
+`npm i quill-to-pdf --save`
 
 ## How Do I Use It?
 
-Pass a QuillJS delta object to the ```generatePdf()``` function of the 
+Pass a QuillJS delta object to the `generatePdf()` function of the `pdfExporter` object, which is imported from the `quill-to-pdf` package. **Be sure** to `await` the `generatePdf()` function, because it returns a `Promise`.
+
+```
+const quillDelta = quillInstance.getContents();
+const pdfBlob = pdfExporter.generatePdf(quillDelta);
+```
+
+The `quillInstance` refers to the object created by `new Quill()`.
