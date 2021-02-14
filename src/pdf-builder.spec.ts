@@ -1,4 +1,3 @@
-import { EPERM } from 'constants';
 import { InsertEmbed, ParsedQuillDelta, RawQuillDelta, RunAttributes } from 'quilljs-parser';
 import { Config, LineAttr, QParagraph, Runs, TextBase } from './interfaces';
 import { default as PdfBuilder } from './pdf-builder';
@@ -6,7 +5,6 @@ jest.mock('./pdfkit.standalone.js');
 jest.mock('quilljs-parser');
 import { parseQuillDelta } from 'quilljs-parser';
 import PDFDocument from './pdfkit.standalone';
-import { parse } from 'path';
 
 class MockPDFDocument {
     addedText: any[];
