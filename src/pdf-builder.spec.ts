@@ -67,7 +67,7 @@ describe('PdfBuilder', () => {
         beforeEach(() => {
             fakeDoc = undefined;
             fakeDelta = { ops: [{ insert: '\n' }]};
-            fakeConfig = { exportAs: 'blob' };
+            fakeConfig = {};
         });
 
         it('should be defined', () => {
@@ -1031,7 +1031,6 @@ describe('PdfBuilder', () => {
 
         it('should override normal default style', () => {
             const config: Config = {
-                exportAs: 'blob',
                 styles: {
                     normal: {
                         font: 'Arial',
@@ -1062,7 +1061,6 @@ describe('PdfBuilder', () => {
 
         it('should override the default header_1 style', () => {
             const config: Config = {
-                exportAs: 'blob',
                 styles: {
                     header_1: {
                         font: 'Avenir',
@@ -1089,7 +1087,6 @@ describe('PdfBuilder', () => {
 
         it('should override the default header_2 style', () => {
             const config: Config = {
-                exportAs: 'blob',
                 styles: {
                     header_2: {
                         font: 'Times-Roman',
@@ -1110,7 +1107,6 @@ describe('PdfBuilder', () => {
 
         it('should override the default block_quote and code_block styles', () => {
             const config: Config = {
-                exportAs: 'blob',
                 styles: {
                     block_quote: {
                         font: 'Courier',
@@ -1153,7 +1149,6 @@ describe('PdfBuilder', () => {
 
         it('should override the default list_paragraph style', () => {
             const config: Config = {
-                exportAs: 'blob',
                 styles: {
                     list_paragraph: {
                         font: 'Arial',
@@ -1174,7 +1169,6 @@ describe('PdfBuilder', () => {
 
         it('should override the default citation style', () => {
             const config: Config = {
-                exportAs: 'blob',
                 styles: {
                     citation: {
                         font: 'Monospace',
