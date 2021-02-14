@@ -23,7 +23,7 @@ class PdfBuilder {
 
 
     // Starts the PDF stream which will contain the PDF document output
-    getPdfStream(doc: any, delta: RawOrParsedDelta, config: Config) {
+    getPdfStream(doc: any, delta: RawOrParsedDelta, config?: Config) {
         this.resetLevelTrackers();
         this.resetStyles();
         if (config && config.styles) {

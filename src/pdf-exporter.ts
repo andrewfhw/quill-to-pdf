@@ -11,7 +11,7 @@ export class PdfExporter {
 
     // This is the function that should be called by external users.
     // Accepts a raw Quill delta or a parsed Quill delta (or an array of either)
-    public generatePdf(delta: RawOrParsedDelta, config: Config): Promise<Blob | object> {
+    public generatePdf(delta: RawOrParsedDelta, config?: Config): Promise<Blob> {
         return new Promise((resolve, reject) => {
             try {
                 let doc: any;

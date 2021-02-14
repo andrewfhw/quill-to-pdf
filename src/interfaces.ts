@@ -35,7 +35,6 @@ export interface StyleConfig {
 }
 
 export interface Config {
-    exportAs: 'blob' | 'pdfKit';
     styles?: Partial<StyleConfig>;
 }
 
