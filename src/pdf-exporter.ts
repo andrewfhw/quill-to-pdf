@@ -16,12 +16,10 @@ export class PdfExporter {
             try {
                 let doc: any;
                 const stream = this._pdfBuilder.getPdfStream(doc, delta, config);
-                console.log('stream', stream);
                 stream.on('finish', () => {
                     const blob = stream.toBlob('application/pdf');
                     resolve(blob);
                 });
-               resolve(stream.toBlob('application/pdf'));
             } catch (err) {
                 reject(err);
             }

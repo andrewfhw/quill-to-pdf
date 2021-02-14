@@ -4,7 +4,7 @@
 
 **Simple Description**: Turn the content of your QuillJS editor into a downloadable PDF document.
 
-**Technical Description***: Convert a QuillJS delta object into a .pdf BLOB.
+**Technical Description**: Convert a QuillJS delta object into a .pdf BLOB.
 
 Check out a live demo on [StackBlitz](https://stackblitz.com/edit/quill-to-pdf-demo?file=src/app/app.component.ts).
 
@@ -69,7 +69,7 @@ async function export() {
 
 ## Which QuillJS Formatting Features Are Supported?
 
-Quill offers a wide range of [formatting features](https://quilljs.com/docs/formats/). QuillToPDF **does not currently support all Quill formatting features.**
+Quill offers a wide range of [formatting features](https://quilljs.com/docs/formats/). QuillToPDF **does not currently support all Quill formatting features.** This is because replicating some of the QuillJS formats using PDFKit, which this package relies on, is complicated.
 
 The following features are **fully** supported:
 
