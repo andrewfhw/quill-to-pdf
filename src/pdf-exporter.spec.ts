@@ -1,6 +1,10 @@
+jest.mock('./pdf-builder');
+
+import { default as PdfBuilder } from './pdf-builder';
 import { Config, RawOrParsedDelta } from './interfaces';
 import { default as exporter, PdfExporter } from './pdf-exporter';
 
+const mockPdfBuilder = PdfBuilder as jest.MockedClass<typeof PdfBuilder>;
 
 describe('exported object', () => {
 
@@ -52,11 +56,13 @@ describe('generatePdf', () => {
     });
 
     it('should call getPdfStream and resolve with the blob', async () => {
-        const getPdfSpy = jest.spyOn(exporter.pdfBuilder, 'getPdfStream').mockReturnValue(fakeStream);
+        mockPdfBuilder.prototype.getPdfStream.mockReturnValue(fakeStream);
         const promise = exporter.generatePdf(fakeDelta, fakeConfig);
-        expect(getPdfSpy).toHaveBeenCalledWith(undefined, fakeDelta, fakeConfig);
+        expect(mockPdfBuilder.prototype.getPdfStream).toHaveBeenCalledTimes(1);
+        expect(mockPdfBuilder.prototype.getPdfStream).toHaveBeenCalledWith(undefined, fakeDelta, fakeConfig);
         expect(fakeStream.onRecord.event).toBe('finish');
         expect(fakeStream.onRecord.callback.toString().replace(/ /g, '').replace(/\n/g, '')).toBe('()=>{constblob=stream.toBlob(\'application/pdf\');resolve(blob);}');
     });
+
 
 });

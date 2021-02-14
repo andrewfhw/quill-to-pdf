@@ -3,10 +3,10 @@ import {default as PdfBuilder } from './pdf-builder';
 
 export class PdfExporter {
 
-    readonly pdfBuilder: PdfBuilder;
+    private readonly _pdfBuilder: PdfBuilder;
 
     constructor() {
-        this.pdfBuilder = new PdfBuilder();
+        this._pdfBuilder = new PdfBuilder();
     }
 
     // This is the function that should be called by external users.
@@ -15,7 +15,7 @@ export class PdfExporter {
         return new Promise((resolve, reject) => {
             try {
                 let doc: any;
-                const stream = this.pdfBuilder.getPdfStream(doc, delta, config);
+                const stream = this._pdfBuilder.getPdfStream(doc, delta, config);
                 stream.on('finish', () => {
                     const blob = stream.toBlob('application/pdf');
                     resolve(blob);
