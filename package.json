@@ -1,6 +1,6 @@
 {
   "name": "quill-to-pdf",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Create a PDF from a QuillJS delta",
   "main": "./dist/main.js",
   "types": "./dist/src/index.d.ts",
