@@ -106,4 +106,72 @@ The following features are **NOT** supported:
 
 ## How Can I Configure QuillToPDF?
 
-Documentation for configuring the default styles is coming soon!
+Currently, QuillToPDF allows you to configure the styles used for the main text formats that appear in a Quill editor.
+
+Six text formats are currently recognized by QuillToPDF:
+
+1. **Normal**&mdash;refers to basic text (`normal`)
+2. **Header 1**&mdash;refers to a level one heading (`header_1`)
+3. **Header 2**&mdash;refers to a level two heading (`header_2`)
+4. **Block Quote**&mdash;refers to a block quote (`block_quote`)
+5. **Code Block**&mdash;refers to a block of code (`code_block`)
+6. **List Paragraph**&mdash;refers to the text in a bulleted or ordered list (`list_paragraph`)
+
+QuillToPDF provides default styles for each of these six text formats. For instance, `normal` text is automatically formatted as Times-Roman font and 12 points in size, whereas `header_1` text is automatically formatted as Helvetica-Bold font and 16 points in size.
+
+The default styles for the 6 text formats can be overridden by providing a style configuration object as the **second argument** to the `generatePdf()` function.
+
+The configuration object should satisfy the following interface:
+
+```javascript
+interface Config {
+    styles: {
+        normal?: {
+            font?: string;
+            fontSize?: number; // specified in points
+            baseIndent?: number; // specified in points w/ 72 ppi
+            levelIndent?: number; // only used for lists
+            indent?: {
+                left?: number;
+                right?: number;
+            }
+        }
+    }
+}
+```
+
+The object in the `styles` property above can contain a key for any of the six text formats: `normal`, `header_1`, `header_2`, `block_quote`, `code_block`, or `list_paragraph`. 
+
+For example, if I want to override the default style for a level one heading, I could do the following:
+
+```javascript
+// create a configuration object that satisfies the interface above
+const config: Config = {
+    styles: {
+        header_1: {
+            font: 'Times-Bold', // default is 'Helvetica-Bold'
+            fontSize: 18 // default is 16
+        }
+    }
+};
+
+// pass the configuration object as the second argument to generatePdf()
+const pdfBlob = await pdfExporter.generatePdf(quillDelta, config);
+```
+
+The options for font are limited to those that come pre-packaged with PDFKit:
+
+- `'Courier'`
+- `'Courier-Bold'`
+- `'Courier-Oblique'`
+- `'Courier-BoldOblique'`
+- `'Helvetica'`
+- `'Helvetica-Bold'`
+- `'Helvetica-Oblique'`
+- `'Helvetica-BoldOblique'`
+- `'Times-Roman'`
+- `'Times-Bold'`
+- `'Times-Italic'`
+- `'Times-BoldItalic'`
+
+Again, check out the demo on [StackBlitz](https://stackblitz.com/edit/quill-to-pdf-demo?file=src/app/app.component.ts).
