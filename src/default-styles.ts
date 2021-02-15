@@ -1,6 +1,6 @@
-import { StyleConfig } from "./interfaces";
+import { Style } from "./interfaces";
 
-export let styles: StyleConfig = {
+export let styles: Style = {
     normal: {
         font: 'Times-Roman',
         fontSize: 12,
@@ -34,11 +34,7 @@ export let styles: StyleConfig = {
         font: 'Courier',
         fontSize: 12,
         baseIndent: 72,
-        levelIndent: 0,
-        indent: {
-            left: 0,
-            right: 0
-        }
+        levelIndent: 0
     },
     list_paragraph: {
         font: 'Times-Roman',

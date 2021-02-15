@@ -1007,6 +1007,12 @@ describe('PdfBuilder', () => {
                     right: 150
                 }
             });
+            expect(builder.style.header_1).toEqual({
+                font: 'Helvetica-Bold',
+                fontSize: 16,
+                baseIndent: 72,
+                levelIndent: 0
+            });
         });
 
         it('should override the default header_1 style', () => {
@@ -1052,6 +1058,12 @@ describe('PdfBuilder', () => {
                 fontSize: 14,
                 baseIndent: 80,
                 levelIndent: 22
+            });
+            expect(builder.style.normal).toEqual({
+                font: 'Times-Roman',
+                fontSize: 12,
+                baseIndent: 72,
+                levelIndent: 0,
             });
         });
 
@@ -1134,6 +1146,50 @@ describe('PdfBuilder', () => {
                 fontSize: 15,
                 levelIndent: 12,
                 baseIndent: 33
+            });
+        });
+
+        it('should only partially override normal style', () => {
+            const config: Config = {
+                styles: {
+                    normal: {
+                        font: 'Arial'
+                    }
+                }
+            };
+            builder.configureStyles(config);
+            expect(builder.style.normal).toEqual({
+                font: 'Arial',
+                fontSize: 12,
+                baseIndent: 72,
+                levelIndent: 0
+            });
+        });
+
+        it('should add a style that did not exist previously', () => {
+            const config: Config = {
+                styles: {
+                    footer: {
+                        font: 'Avenir',
+                        fontSize: 8,
+                        baseIndent: 72,
+                        levelIndent: 0
+                    }
+                }
+            };
+            builder.configureStyles(config);
+            expect(builder.style).toHaveProperty('footer');
+            expect(builder.style.footer).toEqual({
+                font: 'Avenir',
+                fontSize: 8,
+                baseIndent: 72,
+                levelIndent: 0
+            });
+            expect(builder.style.normal).toEqual({
+                font: 'Times-Roman',
+                fontSize: 12,
+                baseIndent: 72,
+                levelIndent: 0,
             });
         });
 

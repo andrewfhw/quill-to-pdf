@@ -11,27 +11,38 @@ export interface QParagraph extends Paragraph {
 
 export type RawOrParsedDelta = RawQuillDelta | ParsedQuillDelta | RawQuillDelta[] | ParsedQuillDelta[];
 
-export interface RequiredStyleInfo {
+export interface StyleInfo {
     font: string;
     fontSize: number;
     baseIndent: number;
     levelIndent: number;
     italics?: boolean;
     indent?: {
-        left: number;
-        right: number;
+        left?: number;
+        right?: number;
     };
 }
 
+export interface Style {
+    [index: string]: StyleInfo;
+    normal: StyleInfo;
+    header_1: StyleInfo;
+    header_2: StyleInfo;
+    block_quote: StyleInfo;
+    code_block: StyleInfo;
+    list_paragraph: StyleInfo;
+    citation: StyleInfo;
+}
+
 export interface StyleConfig {
-    [index: string]: RequiredStyleInfo;
-    normal: RequiredStyleInfo;
-    header_1: RequiredStyleInfo;
-    header_2: RequiredStyleInfo;
-    block_quote: RequiredStyleInfo;
-    code_block: RequiredStyleInfo;
-    list_paragraph: RequiredStyleInfo;
-    citation: RequiredStyleInfo;
+    [index: string]: Partial<StyleInfo>;
+    normal: Partial<StyleInfo>;
+    header_1: Partial<StyleInfo>;
+    header_2: Partial<StyleInfo>;
+    block_quote: Partial<StyleInfo>;
+    code_block: Partial<StyleInfo>;
+    list_paragraph: Partial<StyleInfo>;
+    citation: Partial<StyleInfo>;
 }
 
 export interface Config {

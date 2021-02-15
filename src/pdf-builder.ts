@@ -1,7 +1,7 @@
 import PDFDocument from './pdfkit.standalone';
 import BlobStream from './blob-stream';
 import { letters, numbers, roman, styles } from "./default-styles";
-import { Config, LineAttr, QParagraph, RawOrParsedDelta, Runs, StyleConfig, TextBase } from "./interfaces";
+import { Config, LineAttr, QParagraph, RawOrParsedDelta, Runs, Style, StyleConfig, StyleInfo, TextBase } from "./interfaces";
 import { InsertEmbed, ParsedQuillDelta, parseQuillDelta, RawQuillDelta, RunAttributes, TextRun } from 'quilljs-parser';
 
 class PdfBuilder {
@@ -13,7 +13,7 @@ class PdfBuilder {
     levelTrackers: number[];
 
     // the default text styles
-    style: StyleConfig;
+    style: Style;
 
     constructor() {
         this.style = Object.assign({}, styles);
@@ -79,7 +79,7 @@ class PdfBuilder {
             doc.font(this.style.normal.font);
             doc.fontSize(this.style.normal.fontSize);
             doc.fillColor('blue');
-            doc.text(embed.video, 72, null, {
+            doc.text(embed.video, this.style.normal.baseIndent ? this.style.normal.baseIndent :  72, null, {
                 underline: false,
                 strike: false,
                 oblique: false,
@@ -353,8 +353,16 @@ class PdfBuilder {
             throw new Error('No style keys found.');
         }
         for (const key of Object.keys(config.styles)) {
-            if (config.styles[key]) {
-                this.style[key] = config.styles[key] as any;
+            const keyValue = config.styles[key];
+            if (keyValue !== undefined) {
+                if (this.style[key]) {
+                    const defaultStyle = Object.assign({}, this.style[key]);
+                    const customStyle = Object.assign({}, config.styles[key]);
+                    const merged = Object.assign(defaultStyle, customStyle);
+                    this.style[key] = merged;
+                } else {
+                    this.style[key] = keyValue as StyleInfo;
+                }
             }
         };
     }
