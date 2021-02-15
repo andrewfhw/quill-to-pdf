@@ -225,7 +225,13 @@ describe('PdfBuilder', () => {
             builder.buildEmbed(embed, mockDoc);
             expect(fontSpy).toHaveBeenCalledWith('Times-Roman');
             expect(sizeSpy).toHaveBeenCalledWith(12);
-            expect(textSpy).toHaveBeenCalledWith('linktovideo', { continued: false });
+            expect(textSpy).toHaveBeenCalledWith('linktovideo', 72, null, { 
+                link: 'linktovideo',
+                underline: false,
+                strike: false,
+                oblique: false,
+                continued: false
+             });
         });
 
     });
@@ -234,8 +240,6 @@ describe('PdfBuilder', () => {
     describe('buildSimpleParagraphs', () => {
 
         it('should set font, fontsize, and call build runs', () => {
-            const fontSpy = jest.spyOn(mockDoc, 'font');
-            const sizeSpy = jest.spyOn(mockDoc, 'fontSize');
             const buildRunSpy = jest.spyOn(builder, 'buildRuns').mockImplementation(() => null);
             const mockPara: QParagraph = {
                 textRuns: [{
@@ -243,8 +247,6 @@ describe('PdfBuilder', () => {
                 }]
             };
             builder.buildSimpleParagraphs(mockPara, mockDoc);
-            expect(fontSpy).toHaveBeenCalledWith('Times-Roman');
-            expect(sizeSpy).toHaveBeenCalledWith(12);
             expect(buildRunSpy).toHaveBeenCalledWith([{ text: 'Here is the basic text'}], {
                 font: 'Times-Roman',
                 fontSize: 12,
@@ -349,8 +351,6 @@ describe('PdfBuilder', () => {
         it('should build a level one heading', () => {
             const runs: Runs = [{ text: 'The Title of the Heading' }];
             builder.buildHeader(runs, 1, mockDoc);
-            expect(fontSpy).toHaveBeenCalledWith('Helvetica-Bold');
-            expect(sizeSpy).toHaveBeenCalledWith(16);
             expect(buildRunSpy).toHaveBeenCalledWith(runs, {
                 font: 'Helvetica-Bold',
                 fontSize: 16,
@@ -361,8 +361,6 @@ describe('PdfBuilder', () => {
         it('should build a level two heading', () => {
             const runs: Runs = [{ text: 'The Title of the Heading' }];
             builder.buildHeader(runs, 2, mockDoc);
-            expect(fontSpy).toHaveBeenCalledWith('Helvetica-Bold');
-            expect(sizeSpy).toHaveBeenCalledWith(14);
             expect(buildRunSpy).toHaveBeenCalledWith(runs, {
                 font: 'Helvetica-Bold',
                 fontSize: 14,
@@ -376,13 +374,9 @@ describe('PdfBuilder', () => {
     describe('buildBlockQuote', () => {
 
         it('should build a block quote', () => {
-            const fontSpy = jest.spyOn(mockDoc, 'font');
-            const sizeSpy = jest.spyOn(mockDoc, 'fontSize');
             const buildRunsSpy = jest.spyOn(builder, 'buildRuns').mockImplementationOnce(() => null);
             const runs: Runs = [{ text: 'Text of the block quote' }];
             builder.buildBlockQuote(runs, mockDoc);
-            expect(fontSpy).toHaveBeenCalledWith('Times-Italic');
-            expect(sizeSpy).toHaveBeenCalledWith(12);
             expect(buildRunsSpy).toHaveBeenCalledWith(runs, {
                 font: 'Times-Italic',
                 fontSize: 12,
@@ -396,13 +390,9 @@ describe('PdfBuilder', () => {
     describe('buildCodeBlock', () => {
 
         it('should build a code block', () => {
-            const fontSpy = jest.spyOn(mockDoc, 'font');
-            const sizeSpy = jest.spyOn(mockDoc, 'fontSize');
             const buildRunsSpy = jest.spyOn(builder, 'buildRuns').mockImplementationOnce(() => null);
             const runs: Runs = [{ text: 'this is a code block' }];
             builder.buildCodeBlock(runs, mockDoc);
-            expect(fontSpy).toHaveBeenCalledWith('Courier');
-            expect(sizeSpy).toHaveBeenCalledWith(12);
             expect(buildRunsSpy).toHaveBeenCalledWith(runs, {
                 font: 'Courier',
                 fontSize: 12,
@@ -571,16 +561,10 @@ describe('PdfBuilder', () => {
     describe('buildCitation', () => {
 
         it('should build a citation', () => {
-            const fontSpy = jest.spyOn(mockDoc, 'font');
-            const sizeSpy = jest.spyOn(mockDoc, 'fontSize');
-            const fillSpy = jest.spyOn(mockDoc, 'fillColor');
             const runSpy = jest.spyOn(builder, 'buildRuns').mockImplementationOnce(() => null);
             const runs: Runs = [{ text: 'Here is a citation.' }];
             const attr: LineAttr = { citation: true };
             builder.buildCitation(runs, attr, mockDoc);
-            expect(fontSpy).toHaveBeenCalledWith('Times-Roman');
-            expect(sizeSpy).toHaveBeenCalledWith(12);
-            expect(fillSpy).toHaveBeenCalledWith('black');
             expect(runSpy).toHaveBeenCalledWith(runs, {
                 font: 'Times-Roman',
                 fontSize: 12,

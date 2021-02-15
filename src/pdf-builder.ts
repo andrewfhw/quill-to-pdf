@@ -78,7 +78,12 @@ class PdfBuilder {
         } else if (embed.video) {
             doc.font(this.style.normal.font);
             doc.fontSize(this.style.normal.fontSize);
-            doc.text(embed.video, {
+            doc.fillColor('blue');
+            doc.text(embed.video, 72, null, {
+                underline: false,
+                strike: false,
+                oblique: false,
+                link: embed.video,
                 continued: false
             });
         }
@@ -90,8 +95,6 @@ class PdfBuilder {
 
     // handle all unformatted paragraphs
     buildSimpleParagraphs(paragraph: QParagraph, doc: any): void {
-        doc.font(this.style.normal.font);
-        doc.fontSize(this.style.normal.fontSize);
         const baseIndent = this.style.normal.baseIndent;
         this.buildRuns(paragraph.textRuns as TextRun[], {
             font: this.style.normal.font,
@@ -134,16 +137,12 @@ class PdfBuilder {
     // builds paragraphs with header formatting
     buildHeader(textRuns: Runs, level: number, doc: any): void {
         if (level === 1) {
-            doc.font(this.style.header_1.font);
-            doc.fontSize(this.style.header_1.fontSize);
             this.buildRuns(textRuns, {
                 font: this.style.header_1.font,
                 fontSize: this.style.header_1.fontSize,
                 indent: this.style.header_1.baseIndent
             }, doc);
         } else if (level === 2) {
-            doc.font(this.style.header_2.font);
-            doc.fontSize(this.style.header_2.fontSize);
             this.buildRuns(textRuns, {
                 font: this.style.header_2.font,
                 fontSize: this.style.header_2.fontSize,
@@ -155,8 +154,6 @@ class PdfBuilder {
 
     // builds paragraphs with blockquote formatting
     buildBlockQuote(textRuns: Runs, doc: any): void {
-        doc.font(this.style.block_quote.font);
-        doc.fontSize(this.style.block_quote.fontSize);
         this.buildRuns(textRuns, {
             font: this.style.block_quote.font,
             fontSize: this.style.block_quote.fontSize,
@@ -167,8 +164,6 @@ class PdfBuilder {
 
     // builds paragraphs with code block formatting
     buildCodeBlock(textRuns: Runs, doc: any): void {
-        doc.font(this.style.code_block.font);
-        doc.fontSize(this.style.code_block.fontSize);
         this.buildRuns(textRuns, {
             font: this.style.code_block.font,
             fontSize: this.style.code_block.fontSize,
@@ -195,16 +190,16 @@ class PdfBuilder {
         doc.fillColor('black');
         let baseIndent = this.style.list_paragraph.baseIndent;
         let levelIndent = this.style.list_paragraph.levelIndent;
-        let level = (lineAttributes.indent ? lineAttributes.indent : 0);
-        doc.text(this.getListIndicator(level) + '.', baseIndent + (levelIndent * (level + 1)), null, {
-            width: (72*6.5)-(3+(baseIndent)+levelIndent*(level + 1)),
+        let level = (lineAttributes.indent ? lineAttributes.indent : 0) + 1;
+        doc.text(this.getListIndicator(level - 1) + '.', baseIndent + (levelIndent * level), null, {
+            width: (72*6.5)-(3+(baseIndent)+levelIndent*level),
             continued: false
         });
         doc.moveUp();
         this.buildRuns(textRuns, {
             font: this.style.list_paragraph.font,
             fontSize: this.style.list_paragraph.fontSize,
-            indent: baseIndent + levelIndent + 3 + (levelIndent * (level + 1))
+            indent: baseIndent + levelIndent + 3 + (levelIndent * level)
         }, doc);
     };
 
@@ -231,9 +226,6 @@ class PdfBuilder {
 
 
     buildCitation(textRuns: Runs, lineAttributes: LineAttr, doc: any): void {
-        doc.font(this.style.citation.font);
-        doc.fontSize(this.style.citation.fontSize);
-        doc.fillColor('black');
         this.buildRuns(textRuns, {
             font: this.style.citation.font,
             fontSize: this.style.citation.fontSize,
