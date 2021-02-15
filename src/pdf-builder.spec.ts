@@ -5,7 +5,7 @@ jest.mock('./pdfkit.standalone.js');
 jest.mock('quilljs-parser');
 import { parseQuillDelta } from 'quilljs-parser';
 import PDFDocument from './pdfkit.standalone';
-import { MockPDFDocument } from './test-utilities';
+import { FakeStream, MockPDFDocument } from './test-utilities';
 
 // create a type safe version of the PDFDocument mock from pdfkit
 const mockPdfKit = PDFDocument as jest.MockedClass<typeof PDFDocument>;
@@ -53,7 +53,7 @@ describe('PdfBuilder', () => {
             expect(resetStyleSpy).toHaveBeenCalled();
             expect(styleConfigSpy).not.toHaveBeenCalled();
             expect(mockPdfKit).toHaveBeenCalled();
-            expect(stream).toBeInstanceOf(MockPDFDocument);
+            expect(stream).toBeInstanceOf(FakeStream);
             expect(prepareSpy).toHaveBeenCalledWith(fakeDelta);
             const doc = new MockPDFDocument();
             doc.endCalled = true;
@@ -81,7 +81,7 @@ describe('PdfBuilder', () => {
             expect(resetStyleSpy).toHaveBeenCalled();
             expect(styleConfigSpy).toHaveBeenCalledWith(fakeConfig);
             expect(mockPdfKit).toHaveBeenCalled();
-            expect(stream).toBeInstanceOf(MockPDFDocument);
+            expect(stream).toBeInstanceOf(FakeStream);
             expect(prepareSpy).toHaveBeenCalledWith(fakeDelta);
             const doc = new MockPDFDocument();
             doc.endCalled = true;

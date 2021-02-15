@@ -51,7 +51,7 @@ export class MockPDFDocument {
     }
     pipe(arg: any) {
         
-        return this;
+        return new FakeStream();
     }
     end() {
         
