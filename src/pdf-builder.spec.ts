@@ -5,47 +5,13 @@ jest.mock('./pdfkit.standalone.js');
 jest.mock('quilljs-parser');
 import { parseQuillDelta } from 'quilljs-parser';
 import PDFDocument from './pdfkit.standalone';
+import { MockPDFDocument } from './test-utilities';
 
-class MockPDFDocument {
-    addedText: any[];
-    endCalled: boolean;
-    constructor() {
-        this.addedText = [];
-        this.endCalled = false;
-    }
-    text(added: any) {
-        this.addedText.push(added)
-        return this;
-    }
-    pipe() {
-        return this;
-    }
-    end() {
-        this.endCalled = true;
-        return this;
-    }
-    image() {
-        return;
-    }
-    font() {
-        return;
-    }
-    fontSize() {
-        return;
-    }
-    moveDown() {
-        return;
-    }
-    moveUp() {
-        return;
-    }
-    fillColor() {
-        return;
-    }
-}
-
-(PDFDocument as any).mockReturnValue(new MockPDFDocument());
-
+// create a type safe version of the PDFDocument mock from pdfkit
+const mockPdfKit = PDFDocument as jest.MockedClass<typeof PDFDocument>;
+// mock the return value of the PDFDocument constructor
+mockPdfKit.mockReturnValue(new MockPDFDocument() as any);
+// create a type safe version of the parseQuillDelta function from quilljs parser
 const mockParseDelta = parseQuillDelta as jest.MockedFunction<typeof parseQuillDelta>;
 
 describe('PdfBuilder', () => {
@@ -86,7 +52,7 @@ describe('PdfBuilder', () => {
             expect(resetSpy).toHaveBeenCalled();
             expect(resetStyleSpy).toHaveBeenCalled();
             expect(styleConfigSpy).not.toHaveBeenCalled();
-            expect(PDFDocument).toHaveBeenCalled();
+            expect(mockPdfKit).toHaveBeenCalled();
             expect(stream).toBeInstanceOf(MockPDFDocument);
             expect(prepareSpy).toHaveBeenCalledWith(fakeDelta);
             const doc = new MockPDFDocument();
@@ -114,7 +80,7 @@ describe('PdfBuilder', () => {
             expect(resetSpy).toHaveBeenCalled();
             expect(resetStyleSpy).toHaveBeenCalled();
             expect(styleConfigSpy).toHaveBeenCalledWith(fakeConfig);
-            expect(PDFDocument).toHaveBeenCalled();
+            expect(mockPdfKit).toHaveBeenCalled();
             expect(stream).toBeInstanceOf(MockPDFDocument);
             expect(prepareSpy).toHaveBeenCalledWith(fakeDelta);
             const doc = new MockPDFDocument();

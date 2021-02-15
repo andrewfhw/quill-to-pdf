@@ -18,7 +18,7 @@ Install using npm:
 
 Pass a QuillJS [delta](https://quilljs.com/docs/delta/) object to the `generatePdf()` function of the `pdfExporter` object, which is imported from the `quill-to-pdf` package. **Be sure** to `await` the `generatePdf()` function, because it returns a `Promise`.
 
-```
+```javascript
 const quillDelta = quillInstance.getContents();
 const pdfBlob = pdfExporter.generatePdf(quillDelta);
 ```

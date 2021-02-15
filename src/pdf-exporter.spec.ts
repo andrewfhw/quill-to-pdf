@@ -1,29 +1,13 @@
 jest.mock('./pdf-builder');
+jest.mock('./pdfkit.standalone');
 
 import { default as PdfBuilder } from './pdf-builder';
 import { Config, RawOrParsedDelta } from './interfaces';
 import { default as exporter, PdfExporter } from './pdf-exporter';
+import { FakeStream } from './test-utilities';
 
+// create a type safe version of the PdfBuilder mock
 const mockPdfBuilder = PdfBuilder as jest.MockedClass<typeof PdfBuilder>;
-
-class FakeStream {
-    onRecord: any;
-    blobArg: string;
-    constructor() {
-        this.onRecord = undefined;
-        this.blobArg = '';
-    }
-    on(event: string, callback: any) {
-        this.onRecord = {
-            event: event,
-            callback: callback
-        }
-    }
-    toBlob(app: string) {
-        this.blobArg = app;
-        return 'fakeblob';
-    }
-}
 
 describe('exported object', () => {
 
@@ -66,6 +50,5 @@ describe('generatePdf', () => {
         expect(fakeStream.onRecord.event).toBe('finish');
         expect(fakeStream.onRecord.callback.toString().replace(/ /g, '').replace(/\n/g, '')).toBe('()=>{constblob=stream.toBlob(\'application/pdf\');resolve(blob);}');
     });
-
 
 });
