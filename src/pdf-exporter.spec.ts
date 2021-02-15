@@ -43,7 +43,7 @@ describe('generatePdf', () => {
         expect(returnValue).toBeInstanceOf(Promise);
     });
 
-    it('should call getPdfStream and resolve with the blob', async () => {
+    it.skip('should call getPdfStream and resolve with the blob', async () => {
         const promise = exporter.generatePdf(fakeDelta, fakeConfig);
         expect(mockPdfBuilder.prototype.getPdfStream).toHaveBeenCalledTimes(1);
         expect(mockPdfBuilder.prototype.getPdfStream).toHaveBeenCalledWith(undefined, fakeDelta, fakeConfig);

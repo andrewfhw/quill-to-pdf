@@ -17,22 +17,8 @@ mockPdfKit.mockImplementation(() => {
 
 describe('integration', () => {
 
-    it('should', async () => {
+   it('', () => {
 
-        const fakeDelta: ParsedQuillDelta = {
-            setup: {
-                hyperlinks: [],
-                numberedLists: 0
-            },
-            paragraphs: [{
-                textRuns: [{
-                    text: "hello there"
-                }]
-            }]
-        };
-        exporter.generatePdf(fakeDelta);
-        console.log(activeMock);
-
-    });
+   });
 
 });
