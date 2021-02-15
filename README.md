@@ -20,7 +20,7 @@ Pass a QuillJS [delta](https://quilljs.com/docs/delta/) object to the `generateP
 
 ```javascript
 const quillDelta = quillInstance.getContents();
-const pdfBlob = pdfExporter.generatePdf(quillDelta);
+const pdfBlob = await pdfExporter.generatePdf(quillDelta);
 ```
 
 The `quillInstance` refers to the object created by `new Quill()`. The `pdfExporter` refers to the default export of the `quill-to-pdf` package, which can be imported as follows: 
